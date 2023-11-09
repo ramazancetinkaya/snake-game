@@ -4,6 +4,10 @@
   A simple, yet classic Snake game developed using HTML, CSS, and JavaScript.
 </p>
 
+<p align="center">
+  ⭐️ If you find this project useful, consider giving it a star to show your support. ⭐
+</p>
+
 ## Description
 
 The Snake Game is a classic arcade game where the player controls a snake that moves around the game area to eat food and grows longer each time it eats. The game gets more challenging as the snake grows, and it must avoid colliding with itself or the walls.
