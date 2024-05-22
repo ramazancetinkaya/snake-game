@@ -12,6 +12,10 @@
   ⭐️ If you find this project useful, consider giving it a star to show your support. ⭐
 </p>
 
+## Demo
+
+[![Demo](https://img.shields.io/badge/Demo-View%20Demo-blue)](https://ramazancetinkaya.github.io/snake-game)
+
 ## About the Project
 
 The Snake Game is a classic arcade game where the player controls a snake that moves around the game area to eat food and grows longer each time it eats. The game gets more challenging as the snake grows, and it must avoid colliding with itself or the walls.
@@ -79,22 +83,12 @@ To play the Snake Game:
 
 ## Contributing
 
-Contributions are welcome! If you'd like to contribute to this project, feel free to fork the repository and submit a pull request with your changes.
-
-If you would like to contribute to the project, please follow these steps:
-
-1. Fork the repository.
-2. Create a new branch for your feature: `git checkout -b feature-name`.
-3. Commit your changes: `git commit -m 'Add some feature'`.
-4. Push to the branch: `git push origin feature-name`.
-5. Submit a pull request.
-
-For major changes, please open an issue first to discuss what you would like to change.
-
-## Credits
-
-This project is created by Ramazan Çetinkaya.
+Contributions are welcome! If you find any issues or have suggestions for improvements, feel free to open an issue or create a pull request.
 
 ## License
 
 This project is licensed under the MIT License. For more details, see the [LICENSE](LICENSE) file.
+
+## Copyright
+
+© 2024 Ramazan Çetinkaya. All rights reserved.
