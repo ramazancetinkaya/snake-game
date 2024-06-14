@@ -17,6 +17,11 @@ body {
     background-color: #17202A;
     display: inline-block;
     position: relative;
+    border: 5px solid #17202A;
+}
+
+.game-area.game-over {
+    border-color: #e74c3c;
 }
 
 canvas {
@@ -40,6 +45,7 @@ canvas {
     text-orientation: mixed;
     border-radius: 20px;
     outline: none;
+    display: none;
 }
 
 #restartButton:hover {

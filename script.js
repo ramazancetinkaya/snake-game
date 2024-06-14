@@ -2,6 +2,7 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const restartButton = document.getElementById('restartButton');
 const scoreDisplay = document.getElementById('score');
+const gameArea = document.querySelector('.game-area');
 
 const gridSize = 20;
 const canvasSize = 400;
@@ -14,6 +15,8 @@ function initGame() {
     speed = 100;
     placeFood();
     clearInterval(gameInterval);
+    gameArea.classList.remove('game-over');
+    restartButton.style.display = 'none';
     gameInterval = setInterval(gameLoop, speed);
     scoreDisplay.textContent = "00";
 }
@@ -54,7 +57,7 @@ function update() {
     snake[0] = head;
 
     if (head.x < 0 || head.x >= canvasSize || head.y < 0 || head.y >= canvasSize || snakeCollision(head)) {
-        initGame();
+        gameOver();
     }
 }
 
@@ -78,6 +81,12 @@ function draw() {
 
 function snakeCollision(head) {
     return snake.some((segment, index) => index !== 0 && segment.x === head.x && segment.y === head.y);
+}
+
+function gameOver() {
+    clearInterval(gameInterval);
+    gameArea.classList.add('game-over');
+    restartButton.style.display = 'block';
 }
 
 window.addEventListener('keydown', e => {
