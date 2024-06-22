@@ -5,8 +5,25 @@ const scoreDisplay = document.getElementById('score');
 const gameArea = document.querySelector('.game-area');
 
 const gridSize = 20;
-const canvasSize = 400;
+
+function getNearestDivisibleBy20(number) {
+    if (number % 20 !== 0) {
+        let nearestDivisible = Math.floor(number / 20) * 20;
+        return nearestDivisible
+    }
+}
+
+nearestDivisible = getNearestDivisibleBy20(window.innerWidth - 50);
+
+const canvasSize = (nearestDivisible) > 400 ? 400 : nearestDivisible;
+
 let snake, food, score, direction, gameInterval, speed;
+
+canvas.width = canvasSize;
+canvas.height = canvasSize;
+
+console.log(window.innerWidth, window.innerHeight);
+console.log(nearestDivisible);
 
 function initGame() {
     snake = [{ x: gridSize * 5, y: gridSize * 5 }];
@@ -89,22 +106,33 @@ function gameOver() {
     restartButton.style.display = 'block';
 }
 
+function setDirection(newDirection) {
+    if ((newDirection.x !== 0 && direction.x === 0) || (newDirection.y !== 0 && direction.y === 0)) {
+        direction = newDirection;
+    }
+}
+
 window.addEventListener('keydown', e => {
     switch (e.key) {
         case 'ArrowUp':
-            if (direction.y === 0) direction = { x: 0, y: -gridSize };
+            setDirection({ x: 0, y: -gridSize });
             break;
         case 'ArrowDown':
-            if (direction.y === 0) direction = { x: 0, y: gridSize };
+            setDirection({ x: 0, y: gridSize });
             break;
         case 'ArrowLeft':
-            if (direction.x === 0) direction = { x: -gridSize, y: 0 };
+            setDirection({ x: -gridSize, y: 0 });
             break;
         case 'ArrowRight':
-            if (direction.x === 0) direction = { x: gridSize, y: 0 };
+            setDirection({ x: gridSize, y: 0 });
             break;
     }
 });
+
+document.getElementById('up').addEventListener('click', () => setDirection({ x: 0, y: -gridSize }));
+document.getElementById('down').addEventListener('click', () => setDirection({ x: 0, y: gridSize }));
+document.getElementById('left').addEventListener('click', () => setDirection({ x: -gridSize, y: 0 }));
+document.getElementById('right').addEventListener('click', () => setDirection({ x: gridSize, y: 0 }));
 
 restartButton.addEventListener('click', initGame);
 

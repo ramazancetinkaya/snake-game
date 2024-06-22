@@ -66,14 +66,46 @@ canvas {
     display: block;
 }
 
-footer {
-    margin-top: 20px;
+.controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.horizontal-controls {
+    display: flex;
+    justify-content: space-between;
+    width: 200px;
+}
+
+.control-button {
+    background-color: #2c3e50;
+    color: #ffffff;
+    border: none;
+    padding: 15px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 20px;
+}
+
+button#up,
+button#down {
+    padding: 15px 20px;
+}
+
+.control-button:hover {
+    background-color: #34495e;
+}
+
+header {
+    margin: 15px 0 10px 0;
     font-size: 14px;
     color: #bdc3c7;
 }
 
-footer span:first-child {
+header span:first-child {
     display: block;
     font-size: 24px;
-    margin-bottom: 5px;
 }

@@ -8,6 +8,10 @@
 </head>
 <body>
     <div class="container">
+        <header>
+            <span>SNAKE</span>
+            <span>GAME</span>
+        </header>
         <div class="game-area">
             <canvas id="gameCanvas" width="400" height="400"></canvas>
             <button id="restartButton">RESTART</button>
@@ -16,10 +20,14 @@
                 <span id="score">00</span>
             </div>
         </div>
-        <footer>
-            <span>SNAKE</span>
-            <span>GAME</span>
-        </footer>
+        <div class="controls">
+            <button class="control-button" id="up">↑</button>
+            <div class="horizontal-controls">
+                <button class="control-button" id="left">←</button>
+                <button class="control-button" id="right">→</button>
+            </div>
+            <button class="control-button" id="down">↓</button>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
