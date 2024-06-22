@@ -14,7 +14,7 @@
 
 ## Demo
 
-[![Demo](https://img.shields.io/badge/Demo-View%20Demo-blue)](https://ramazancetinkaya.github.io/snake-game)
+[![Demo](https://img.shields.io/badge/Demo-View%20Demo-blue)](https://mahdi-marjani.github.io/snake-game)
 
 ## About the Project
 
@@ -47,7 +47,7 @@ No installation is required. Simply clone or download the repository and open th
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/ramazancetinkaya/snake-game.git
+    git clone https://github.com/mahdi-marjani/snake-game.git
     ```
 
 2. Open the project folder:
