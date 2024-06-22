@@ -25,7 +25,7 @@ function initGame() {
     snake = [{ x: gridSize * 5, y: gridSize * 5 }];
     direction = { x: 0, y: 0 };
     score = 0;
-    speed = 100;
+    speed = 150;
     placeFood();
     clearInterval(gameInterval);
     canvas.classList.remove('game-over');
@@ -58,7 +58,6 @@ function update() {
         scoreDisplay.textContent = score.toString().padStart(2, '0');
         snake.push({});
         placeFood();
-        speed -= 5;
         clearInterval(gameInterval);
         gameInterval = setInterval(gameLoop, speed);
     }
