@@ -16,14 +16,10 @@ function getNearestDivisibleBy20(number) {
 nearestDivisible = getNearestDivisibleBy20(window.innerWidth - 50);
 
 const canvasSize = (nearestDivisible) > 400 ? 400 : nearestDivisible;
-
-let snake, food, score, direction, gameInterval, speed;
-
 canvas.width = canvasSize;
 canvas.height = canvasSize;
 
-console.log(window.innerWidth, window.innerHeight);
-console.log(nearestDivisible);
+let snake, food, score, direction, gameInterval, speed;
 
 function initGame() {
     snake = [{ x: gridSize * 5, y: gridSize * 5 }];
@@ -32,7 +28,7 @@ function initGame() {
     speed = 100;
     placeFood();
     clearInterval(gameInterval);
-    gameArea.classList.remove('game-over');
+    canvas.classList.remove('game-over');
     restartButton.style.display = 'none';
     gameInterval = setInterval(gameLoop, speed);
     scoreDisplay.textContent = "00";
@@ -102,7 +98,7 @@ function snakeCollision(head) {
 
 function gameOver() {
     clearInterval(gameInterval);
-    gameArea.classList.add('game-over');
+    canvas.classList.add('game-over');
     restartButton.style.display = 'block';
 }
 

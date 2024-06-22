@@ -1,7 +1,7 @@
 body {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     height: 100vh;
     background-color: #17202A;
     margin: 0;
@@ -17,11 +17,10 @@ body {
     background-color: #17202A;
     display: inline-block;
     position: relative;
-    border: 5px solid #17202A;
 }
 
-.game-area.game-over {
-    border-color: #e74c3c;
+#gameCanvas.game-over {
+    border: 5px solid #e74c3c;
 }
 
 canvas {
@@ -100,7 +99,7 @@ button#down {
 }
 
 header {
-    margin: 15px 0 10px 0;
+    margin: 5px 0;
     font-size: 14px;
     color: #bdc3c7;
 }
@@ -108,4 +107,42 @@ header {
 header span:first-child {
     display: block;
     font-size: 24px;
+}
+
+@media (max-width: 768px) {
+    .game-area {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .scoreboard {
+        position: static;
+        transform: none;
+        margin: 10px 0;
+    }
+
+    #restartButton {
+        position: static;
+        transform: none;
+        rotate: -90deg;
+        margin-top: 10px;
+        margin-left: 41%;
+    }
+
+    .controls {
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin: 0;
+    }
+
+    .horizontal-controls {
+        width: 100%;
+        justify-content: center;
+        gap: 80px;
+    }
+
+    .control-button {
+        margin: 5px;
+    }
 }
