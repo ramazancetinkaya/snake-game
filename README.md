@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://www.educative.io/v2api/editorpage/6684016653631488/image/5929780181467136" alt="Snake Game Logo">
+</p>
+
 # 🐍 **Modern Snake Game**
 
 A modern, responsive, and visually appealing Snake Game built using HTML5, CSS3, and JavaScript. This project is perfect for those who want to experience classic gameplay with a touch of modern design.
@@ -83,7 +87,7 @@ Contributions are welcome! Please feel free to submit a pull request or open an 
 
 ## 📄 **License**
 
-This project is licensed under the MIT License. See the LICENSE file for more details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
 ## 🙌 **Acknowledgments**
 
