@@ -10,7 +10,7 @@ A modern, responsive, and visually appealing Snake Game built using HTML5, CSS3,
 - [Technologies Used](#%EF%B8%8F-technologies-used)
 - [Project Structure](#-project-structure)
 - [Setup and Usage](#-setup-and-usage)
-- [Planned Enhancements](#-future-enhancements)
+- [Future Enhancements](#-future-enhancements)
 - [Contributing](#-contributing)
 - [License](#-license)
 - [Acknowledgments](#-acknowledgments)
@@ -25,9 +25,7 @@ A modern, responsive, and visually appealing Snake Game built using HTML5, CSS3,
 
 ## 🌐 **Live Demo**
 
-Experience the game live:
-
-[![Demo](https://img.shields.io/badge/Demo-View%20Demo-blue)](https://ramazancetinkaya.github.io/snake-game)
+### Experience the game live: &nbsp;[![Demo](https://img.shields.io/badge/Demo-View%20Demo-blue)](https://ramazancetinkaya.github.io/snake-game)
 
 ## 🎮 **How to Play**
 
