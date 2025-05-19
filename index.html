@@ -2,17 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Snake Game</title>
-    <link rel="stylesheet" href="style.css">
+    <link href="style.css" rel="stylesheet">
 </head>
+<audio id="bg-music" loop muted>
+    <source src="assets/sounds/Going Bananas.mp3" type="audio/mpeg">
+</audio>
+<audio id="eat-sound">
+    <source src="assets/sounds/eatFood.wav" type="audio/mpeg">
+</audio>
+<audio id="game-over-sound">
+    <source src="assets/sounds/gameOver.wav" type="audio/mpeg">
+</audio>
 <body>
-    <div class="game-container">
-        <canvas id="gameCanvas"></canvas>
-        <div class="score" id="score">Score: 0</div>
-        <div class="game-over" id="gameOver">Game Over!<br><button onclick="restartGame()">Restart</button></div>
-    </div>
+<div class="start-menu" id="startMenu">
+    <h1>Snake Game</h1>
+    <button onclick="startGame('infinite')">Endless Mode</button>
+    <button onclick="startGame('timed')">Time Attack</button>
+</div>
 
-    <script src="script.js"></script>
+<div class="game-container">
+    <canvas id="gameCanvas"></canvas>
+    <div class="score" id="score">Score: 0</div>
+    <div class="timer" id="timer" style="display: none;">Countdown: 60</div>
+    <div class="game-over" id="gameOver"></div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>

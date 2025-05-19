@@ -1,5 +1,8 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+const bgMusic = document.getElementById("bg-music");
+const eatSound = document.getElementById("eat-sound");
+const gameOverSound = document.getElementById("game-over-sound");
 canvas.width = canvas.height = Math.min(window.innerWidth * 0.9, 600);
 
 const box = canvas.width / 30;
@@ -9,6 +12,38 @@ let snake = [{ x: box * 5, y: box * 5 }];
 let direction = 'RIGHT';
 let food = generateFood();
 let gameLoop;
+let gameMode = 'infinite';
+let timeLeft = 60;
+let countdownInterval=null;
+
+function startGame(mode) {
+    gameMode = mode;
+    document.getElementById('startMenu').style.display = 'none';
+    document.getElementById('timer').style.display = mode === 'timed' ? 'block' : 'none';
+    document.getElementById('score').style.display = 'block';
+    document.getElementById('gameCanvas').style.display = 'block';
+    if (mode === 'timed') {
+        timeLeft = 60;
+        document.getElementById('timer').innerText = `Time Left: ${timeLeft}`;
+        countdownInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').innerText = `Time Left: ${timeLeft}`;
+            if (timeLeft <= 0) endGame();
+        }, 1000);
+    }
+    restartGame();
+    document.addEventListener("click", () => {
+        bgMusic.muted = false;
+        bgMusic.play().catch(() => {});
+    }, { once: true });
+}
+
+function showStartMenu() {
+    document.getElementById('startMenu').style.display = 'block';
+    document.getElementById('gameOver').style.display = 'none';
+    clearInterval(gameLoop);
+    clearInterval(countdownInterval);
+}
 
 function generateFood() {
     let foodX, foodY;
@@ -72,6 +107,8 @@ function moveSnake() {
         if (speed > 50) speed -= 5;
         clearInterval(gameLoop);
         gameLoop = setInterval(update, speed);
+        eatSound.currentTime = 0;
+        eatSound.play();
     } else {
         snake.pop();
     }
@@ -86,9 +123,26 @@ function checkCollision() {
         head.y >= canvas.height ||
         snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)
     ) {
-        document.getElementById('gameOver').style.display = 'block';
-        clearInterval(gameLoop);
+        endGame();
     }
+}
+
+function endGame() {
+    clearInterval(gameLoop);
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+    }
+    const gameOverDiv = document.getElementById('gameOver');
+    gameOverDiv.style.display = 'block';
+    gameOverDiv.innerHTML = `
+        Game Over!<br>
+        <button onclick="restartGame()">Restart Game</button>
+        <button onclick="showStartMenu()">Select Mode</button>
+    `;
+    gameOverSound.play();
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
 }
 
 function restartGame() {
@@ -99,7 +153,20 @@ function restartGame() {
     document.getElementById('score').innerText = `Score: 0`;
     document.getElementById('gameOver').style.display = 'none';
     food = generateFood();
+    clearInterval(gameLoop);
     gameLoop = setInterval(update, speed);
+
+    if (gameMode === 'timed') {
+        timeLeft = 60;
+        document.getElementById('timer').innerText = `Time Left: ${timeLeft}`;
+        if (countdownInterval) clearInterval(countdownInterval);
+        countdownInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').innerText = `Time Left: ${timeLeft}`;
+            if (timeLeft <= 0) endGame();
+        }, 1000);
+    }
+    bgMusic.play();
 }
 
 function update() {
@@ -111,6 +178,10 @@ function update() {
 }
 
 gameLoop = setInterval(update, speed);
+document.getElementById('gameOver').style.display = 'none';
+document.getElementById('timer').style.display = 'none';
+document.getElementById('score').style.display = 'none';
+document.getElementById('gameCanvas').style.display = 'none';
 
 window.addEventListener('resize', () => {
     canvas.width = canvas.height = Math.min(window.innerWidth * 0.9, 600);
