@@ -1,0 +1,806 @@
+<!--
+  Snake Game
+  Author:     Ramazan Çetinkaya (https://github.com/ramazancetinkaya)
+  Repository: https://github.com/ramazancetinkaya/snake-game
+  License:    MIT License
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="A modern, responsive, and smooth Snake game built with vanilla web technologies.">
+  <title>Snake Game</title>
+  <!-- FontAwesome 6 (Cloudflare CDN) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Orientation Lock Screen (Mobile Landscape Blocker) -->
+  <div id="orientation-blocker" class="orientation-blocker" aria-hidden="true">
+    <div class="orientation-blocker-content">
+      <div class="orientation-icon">
+        <i class="fa-solid fa-mobile-screen-button"></i>
+      </div>
+      <h2>Rotate Your Device</h2>
+      <p>Snake on mobile phones is exclusively supported in portrait mode. Please rotate your phone to continue playing.</p>
+    </div>
+  </div>
+
+  <!-- Main App Layout -->
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <h1 class="brand-title">SNAKE</h1>
+        <span class="brand-badge">PRO</span>
+      </div>
+
+      <div class="header-actions">
+        <button id="btn-header-help" class="btn-icon" aria-label="How to Play" title="How to Play (H)">
+          <i class="fa-solid fa-circle-question"></i>
+        </button>
+        <button id="btn-header-achievements" class="btn-icon" aria-label="Achievements" title="Achievements (T)">
+          <i class="fa-solid fa-trophy"></i>
+          <span id="badge-achievements-count" class="icon-sub-badge" style="display: none;">0</span>
+        </button>
+        <button id="btn-header-pause" class="btn-icon" aria-label="Pause Game" title="Pause Game (Space / P)">
+          <i class="fa-solid fa-pause"></i>
+        </button>
+        <button id="btn-header-restart" class="btn-icon" aria-label="Restart Game" title="Restart Game (R)">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+        <button id="btn-header-settings" class="btn-icon" aria-label="Settings" title="Settings (O)">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="game-layout">
+      <!-- Game Board Container -->
+      <section class="board-column">
+        <!-- Live Quick Stats (Mobile / Tablet Bar) -->
+        <div class="mobile-stats-bar">
+          <div class="mini-stat">
+            <span class="mini-label">SCORE</span>
+            <span id="mobile-score-val" class="mini-value">0</span>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-label">BEST</span>
+            <span id="mobile-best-val" class="mini-value">0</span>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-label">SPEED</span>
+            <span id="mobile-speed-val" class="mini-value badge-speed">Normal</span>
+          </div>
+          <div class="mini-stat" id="mobile-combo-stat" style="display: none;">
+            <span class="mini-label">COMBO</span>
+            <span id="mobile-combo-val" class="mini-value text-accent">x2</span>
+          </div>
+        </div>
+
+        <!-- The Snake Board Wrapper -->
+        <div class="board-frame">
+          <div id="game-board" class="game-board" role="region" aria-label="Snake Play Area">
+            <!-- Snake segments and food items injected by JavaScript -->
+          </div>
+
+          <!-- Countdown Overlay (3, 2, 1, GO!) -->
+          <div id="countdown-overlay" class="countdown-overlay" aria-live="polite">
+            <div id="countdown-number" class="countdown-number">3</div>
+            <div class="countdown-label">GET READY!</div>
+          </div>
+
+          <!-- In-Board Pause Overlay (Borderless Optical Blur, Non-Modal) -->
+          <div id="pause-overlay" class="pause-overlay" style="display: none;" aria-live="polite">
+            <div class="inboard-pause-wrap">
+              <div class="inboard-pause-icon">
+                <i class="fa-solid fa-pause"></i>
+              </div>
+              <h2 class="inboard-pause-title">PAUSED</h2>
+              <p class="inboard-pause-hint web-only-hint">Press <kbd>Space</kbd> or click anywhere to resume</p>
+              <p class="inboard-pause-hint touch-only-hint">Tap anywhere to resume</p>
+            </div>
+          </div>
+
+          <!-- Active Powerup / Bonus Pill Banner -->
+          <div id="active-buff-banner" class="buff-banner" style="display: none;">
+            <i class="fa-solid fa-bolt"></i>
+            <span id="buff-banner-text">Chill Mode: 5s</span>
+          </div>
+        </div>
+
+        <!-- Desktop Shortcuts Reference Bar (Sleek single-line strip, Web Only) -->
+        <div class="board-shortcuts-bar web-only-shortcuts" aria-label="Quick Keyboard Hotkeys">
+          <span class="shortcut-tag"><kbd>W A S D</kbd> Steer</span>
+          <span class="shortcut-tag"><kbd>Space / P</kbd> Pause</span>
+          <span class="shortcut-tag"><kbd>R</kbd> Restart</span>
+          <span class="shortcut-tag"><kbd>M</kbd> Mute</span>
+          <span class="shortcut-tag"><kbd>T</kbd> Trophies</span>
+          <span class="shortcut-tag"><kbd>O</kbd> Settings</span>
+          <span class="shortcut-tag"><kbd>H</kbd> Guide</span>
+        </div>
+
+        <!-- Touch Controls for Mobile & Tablet -->
+        <div id="touch-controls" class="touch-controls" aria-label="Touch Directional Controls">
+          <div class="dpad-grid">
+            <div class="dpad-cell cell-empty"></div>
+            <button id="touch-up" class="dpad-btn dpad-up" aria-label="Move Up">
+              <i class="fa-solid fa-chevron-up"></i>
+            </button>
+            <div class="dpad-cell cell-empty"></div>
+
+            <button id="touch-left" class="dpad-btn dpad-left" aria-label="Move Left">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button id="touch-center-pause" class="dpad-btn dpad-center" aria-label="Pause / Resume">
+              <i id="touch-center-icon" class="fa-solid fa-pause"></i>
+            </button>
+            <button id="touch-right" class="dpad-btn dpad-right" aria-label="Move Right">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+            <div class="dpad-cell cell-empty"></div>
+            <button id="touch-down" class="dpad-btn dpad-down" aria-label="Move Down">
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <div class="dpad-cell cell-empty"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sidebar (Desktop & Tablet Landscape) -->
+      <aside class="sidebar-column">
+        <!-- Score Card -->
+        <div class="card stat-card">
+          <div class="card-header">
+            <span class="card-title">SCORE BOARD</span>
+            <span id="current-speed-tag" class="speed-pill">Normal</span>
+          </div>
+          <div class="score-display">
+            <div class="score-item primary-score">
+              <span class="score-label">Current Score</span>
+              <span id="sidebar-score" class="score-number">0</span>
+            </div>
+            <div class="score-divider"></div>
+            <div class="score-item secondary-score">
+              <span class="score-label">Best Record</span>
+              <span id="sidebar-best" class="score-number">0</span>
+            </div>
+          </div>
+
+          <!-- Combo Bar -->
+          <div id="combo-container" class="combo-wrapper" style="opacity: 0.4;">
+            <div class="combo-header">
+              <span class="combo-title"><i class="fa-solid fa-fire text-amber"></i> Combo Streak</span>
+              <span id="combo-multiplier" class="combo-badge">1x</span>
+            </div>
+            <div class="combo-meter">
+              <div id="combo-progress" class="combo-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-Time Run Stats -->
+        <div class="card metrics-card">
+          <span class="card-title">SESSION STATS</span>
+          <div class="metrics-grid">
+            <div class="metric-item">
+              <i class="fa-solid fa-ruler-combined metric-icon"></i>
+              <div class="metric-details">
+                <span class="metric-val" id="stat-length">3</span>
+                <span class="metric-name">Snake Length</span>
+              </div>
+            </div>
+            <div class="metric-item">
+              <i class="fa-solid fa-apple-whole metric-icon text-crimson"></i>
+              <div class="metric-details">
+                <span class="metric-val" id="stat-apples">0</span>
+                <span class="metric-name">Apples Eaten</span>
+              </div>
+            </div>
+            <div class="metric-item">
+              <i class="fa-solid fa-stopwatch metric-icon"></i>
+              <div class="metric-details">
+                <span class="metric-val" id="stat-time">00:00</span>
+                <span class="metric-name">Duration</span>
+              </div>
+            </div>
+            <div class="metric-item">
+              <i class="fa-solid fa-gauge-high metric-icon"></i>
+              <div class="metric-details">
+                <span class="metric-val" id="stat-speed-ms">115ms</span>
+                <span class="metric-name">Tick Rate</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions Card (Achievements & Guide) -->
+        <div class="card quick-actions-card">
+          <div class="quick-action-row" id="row-sidebar-achievements" role="button" tabindex="0" aria-label="Open Achievements">
+            <div class="quick-action-info">
+              <span class="quick-action-title"><i class="fa-solid fa-trophy text-amber"></i> Achievements</span>
+              <span class="quick-action-subtitle">15 Tiered Challenges</span>
+            </div>
+            <span id="sidebar-achievements-val" class="stat-badge">0 / 15</span>
+          </div>
+          <div class="quick-action-divider"></div>
+          <div class="quick-action-row" id="row-sidebar-help" role="button" tabindex="0" aria-label="Open How to Play">
+            <div class="quick-action-info">
+              <span class="quick-action-title"><i class="fa-solid fa-circle-question text-muted"></i> How to Play</span>
+              <span class="quick-action-subtitle">Rules, Foods & Multipliers</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-muted action-arrow"></i>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Developed by <a href="https://github.com/ramazancetinkaya" target="_blank" rel="noopener noreferrer">Ramazan Çetinkaya</a></p>
+    </footer>
+  </div>
+
+  <!-- Dedicated Modal Backdrop Layer (Completely Isolated from Game Board) -->
+  <div id="modal-overlay" class="modal-overlay" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <!-- Ambient Wandering Snake Background Canvas (Only active on Start Screen) -->
+    <canvas id="start-ambient-canvas" class="ambient-canvas"></canvas>
+
+    <!-- START GAME MODAL (Redesigned with Hero Branding & Ambient Feel) -->
+    <div id="modal-start" class="modal-window modal-window-start" role="dialog" aria-modal="true" aria-labelledby="start-modal-title">
+      <div class="modal-card modal-scrollable">
+        <div class="start-hero-header">
+          <div class="start-brand-pill">
+            <span class="start-brand-title">SNAKE</span>
+            <span class="start-brand-badge">PRO</span>
+          </div>
+          <h2 id="start-modal-title" class="start-hero-heading">Welcome to the Arena</h2>
+          <p class="start-hero-subtitle">Classic mechanics reimagined with fluid movement, power-ups and 15 tiered achievements.</p>
+
+          <!-- Quick Stats Ribbon -->
+          <div class="start-stats-ribbon">
+            <div class="ribbon-item">
+              <i class="fa-solid fa-trophy text-amber"></i>
+              <span>Best: <strong id="start-stat-best">0</strong></span>
+            </div>
+            <div class="ribbon-divider"></div>
+            <div class="ribbon-item">
+              <i class="fa-solid fa-apple-whole text-crimson"></i>
+              <span>Apples: <strong id="start-stat-apples">0</strong></span>
+            </div>
+            <div class="ribbon-divider"></div>
+            <div class="ribbon-item">
+              <i class="fa-solid fa-medal text-emerald"></i>
+              <span>Badges: <strong id="start-stat-badges">0/15</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-body">
+          <!-- Game Speed Selection Cards -->
+          <div class="form-group">
+            <div class="form-label-row">
+              <label class="form-label">Choose Game Speed</label>
+              <span class="form-hint">Adjustable in Settings</span>
+            </div>
+            <div class="start-speed-cards" role="radiogroup" aria-label="Game Speed">
+              <button type="button" class="start-speed-card" data-speed="relax" role="radio" aria-checked="false">
+                <div class="speed-card-top">
+                  <span class="speed-card-name">Relax</span>
+                  <span class="speed-card-tag">160ms</span>
+                </div>
+                <p class="speed-card-desc">Calm, forgiving pace for relaxed play & strategy.</p>
+              </button>
+              <button type="button" class="start-speed-card active" data-speed="normal" role="radio" aria-checked="true">
+                <div class="speed-card-top">
+                  <span class="speed-card-name">Normal</span>
+                  <span class="speed-card-tag badge-recommended">Classic</span>
+                </div>
+                <p class="speed-card-desc">The authentic arcade standard. Crisp & balanced.</p>
+              </button>
+              <button type="button" class="start-speed-card" data-speed="fast" role="radio" aria-checked="false">
+                <div class="speed-card-top">
+                  <span class="speed-card-name">Fast</span>
+                  <span class="speed-card-tag badge-hot">80ms • +20% Pts</span>
+                </div>
+                <p class="speed-card-desc">High adrenaline, swift reactions & higher rewards.</p>
+              </button>
+              <button type="button" class="start-speed-card" data-speed="dynamic" role="radio" aria-checked="false">
+                <div class="speed-card-top">
+                  <span class="speed-card-name">Dynamic</span>
+                  <span class="speed-card-tag badge-adaptive">Adaptive</span>
+                </div>
+                <p class="speed-card-desc">Pace smoothly accelerates as your snake grows longer.</p>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer flex-column">
+          <button id="btn-start-game" class="btn btn-primary btn-block btn-lg">
+            <span>Start Game</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+          <div class="start-secondary-links">
+            <button type="button" id="btn-start-open-help" class="text-link-btn">
+              <i class="fa-solid fa-circle-question"></i> How to Play & Rules
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- GAME OVER MODAL (Run Terminated) -->
+    <div id="modal-gameover" class="modal-window modal-window-gameover" role="dialog" aria-modal="true" aria-labelledby="gameover-modal-title">
+      <div class="modal-card modal-scrollable">
+        <div class="modal-header text-center">
+          <span class="badge-danger">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>RUN TERMINATED</span>
+          </span>
+          <h2 id="gameover-modal-title" class="modal-title">Game Over</h2>
+          <p id="gameover-cause" class="modal-subtitle">You hit the wall!</p>
+        </div>
+
+        <div class="modal-body">
+          <div id="new-record-banner" class="new-record-banner" style="display: none;">
+            <i class="fa-solid fa-trophy"></i>
+            <span>NEW PERSONAL RECORD!</span>
+          </div>
+
+          <div class="gameover-hero-score">
+            <span class="hero-score-label">FINAL SCORE</span>
+            <span id="gameover-score" class="hero-score-val">0</span>
+            <span class="hero-score-unit">POINTS</span>
+          </div>
+
+          <div class="gameover-stats-grid">
+            <div class="result-tile">
+              <span class="tile-icon"><i class="fa-solid fa-trophy text-amber"></i></span>
+              <span class="tile-label">Best</span>
+              <span id="gameover-best" class="tile-number">0</span>
+            </div>
+            <div class="result-tile">
+              <span class="tile-icon"><i class="fa-solid fa-apple-whole text-crimson"></i></span>
+              <span class="tile-label">Apples</span>
+              <span id="gameover-apples" class="tile-number">0</span>
+            </div>
+            <div class="result-tile">
+              <span class="tile-icon"><i class="fa-solid fa-bolt text-amber"></i></span>
+              <span class="tile-label">Combo</span>
+              <span id="gameover-combo" class="tile-number">x1</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer flex-column">
+          <button id="btn-gameover-retry" class="btn btn-primary btn-block btn-lg">
+            <i class="fa-solid fa-rotate-right"></i>
+            <span>Play Again</span>
+            <kbd class="btn-kbd web-only-shortcuts">Space / Enter</kbd>
+          </button>
+          <button id="btn-gameover-menu" class="btn btn-secondary btn-block">
+            <i class="fa-solid fa-house"></i>
+            <span>Main Menu</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS MODAL (Ultra-Premium Native Studio Design) -->
+    <div id="modal-settings" class="modal-window modal-window-settings" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+      <div class="modal-card modal-scrollable">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <h2 id="settings-modal-title" class="modal-title">Preferences</h2>
+            <p class="modal-subtitle">Theme styling, speed, boundaries & grid dimensions.</p>
+          </div>
+          <button id="btn-close-settings" class="btn-icon" aria-label="Close Settings">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Active Warning -->
+          <div id="settings-reset-warning" class="notice-box" style="display: none;">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>Changing gameplay options during an active run will reset the current session.</span>
+          </div>
+
+          <!-- Live Interactive Snake Preview Card -->
+          <div class="settings-preview-card">
+            <div class="preview-header-row">
+              <span class="preview-label">LIVE SNAKE PREVIEW</span>
+              <span id="preview-skin-title" class="preview-skin-title">Obsidian Slate</span>
+            </div>
+            <div class="preview-snake-track">
+              <div id="preview-snake-tail" class="preview-segment preview-tail"></div>
+              <div id="preview-snake-body-2" class="preview-segment preview-body"></div>
+              <div id="preview-snake-body-1" class="preview-segment preview-body"></div>
+              <div id="preview-snake-head" class="preview-segment preview-head">
+                <div class="preview-eyes">
+                  <div class="preview-eye preview-eye-1"></div>
+                  <div class="preview-eye preview-eye-2"></div>
+                </div>
+                <div class="preview-tongue"></div>
+              </div>
+              <div class="preview-target-apple" title="Delicious Apple">
+                <div class="mini-apple-leaf"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Snake Skin Selector Row -->
+          <div class="settings-group">
+            <span class="settings-group-label">Color Themes</span>
+            <div class="skin-selector-grid" role="radiogroup" aria-label="Snake Skin Color">
+              <button type="button" class="skin-swatch-card active" data-skin="obsidian" title="Obsidian Slate">
+                <span class="swatch-disc" style="background: linear-gradient(135deg, #1e293b, #334155);"></span>
+                <span class="swatch-label">Obsidian</span>
+                <span class="swatch-check"><i class="fa-solid fa-check"></i></span>
+              </button>
+              <button type="button" class="skin-swatch-card" data-skin="emerald" title="Emerald Viper">
+                <span class="swatch-disc" style="background: linear-gradient(135deg, #065f46, #059669);"></span>
+                <span class="swatch-label">Emerald</span>
+                <span class="swatch-check"><i class="fa-solid fa-check"></i></span>
+              </button>
+              <button type="button" class="skin-swatch-card" data-skin="cobalt" title="Cobalt Navy">
+                <span class="swatch-disc" style="background: linear-gradient(135deg, #1e3a8a, #2563eb);"></span>
+                <span class="swatch-label">Cobalt</span>
+                <span class="swatch-check"><i class="fa-solid fa-check"></i></span>
+              </button>
+              <button type="button" class="skin-swatch-card" data-skin="amber" title="Amber Coral">
+                <span class="swatch-disc" style="background: linear-gradient(135deg, #92400e, #d97706);"></span>
+                <span class="swatch-label">Amber</span>
+                <span class="swatch-check"><i class="fa-solid fa-check"></i></span>
+              </button>
+              <button type="button" class="skin-swatch-card" data-skin="crimson" title="Crimson Ruby">
+                <span class="swatch-disc" style="background: linear-gradient(135deg, #881337, #be123c);"></span>
+                <span class="swatch-label">Ruby</span>
+                <span class="swatch-check"><i class="fa-solid fa-check"></i></span>
+              </button>
+              <button type="button" class="skin-swatch-card" data-skin="sage" title="Sage Olive">
+                <span class="swatch-disc" style="background: linear-gradient(135deg, #365314, #65a30d);"></span>
+                <span class="swatch-label">Sage</span>
+                <span class="swatch-check"><i class="fa-solid fa-check"></i></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Grouped Settings Rows (iOS/macOS Studio Layout) -->
+          <div class="settings-group">
+            <span class="settings-group-label">Gameplay Rules</span>
+            <div class="settings-card-stack">
+              <!-- Row: Sound Effects -->
+              <div class="settings-row">
+                <div class="settings-row-info">
+                  <div class="settings-row-icon"><i id="settings-sound-icon" class="fa-solid fa-volume-high"></i></div>
+                  <div class="settings-row-text">
+                    <span class="settings-row-title">Sound Effects</span>
+                    <span class="settings-row-desc">Audio cues, chimes & alerts</span>
+                  </div>
+                </div>
+                <div class="segmented-control" role="radiogroup" aria-label="Sound Effects">
+                  <button type="button" id="sound-mode-on" class="segment-btn active" data-sound="on">
+                    <i class="fa-solid fa-volume-high"></i> On
+                  </button>
+                  <button type="button" id="sound-mode-off" class="segment-btn" data-sound="off">
+                    <i class="fa-solid fa-volume-xmark"></i> Muted
+                  </button>
+                </div>
+              </div>
+
+              <!-- Row: Speed -->
+              <div class="settings-row">
+                <div class="settings-row-info">
+                  <div class="settings-row-icon"><i class="fa-solid fa-gauge-high"></i></div>
+                  <div class="settings-row-text">
+                    <span class="settings-row-title">Game Speed</span>
+                    <span class="settings-row-desc">Tick interval rate</span>
+                  </div>
+                </div>
+                <div class="segmented-control" role="radiogroup">
+                  <button type="button" class="segment-btn" data-settings-speed="relax">Relax</button>
+                  <button type="button" class="segment-btn active" data-settings-speed="normal">Normal</button>
+                  <button type="button" class="segment-btn" data-settings-speed="fast">Fast</button>
+                  <button type="button" class="segment-btn" data-settings-speed="dynamic">Dynamic</button>
+                </div>
+              </div>
+
+              <!-- Row: Boundaries -->
+              <div class="settings-row">
+                <div class="settings-row-info">
+                  <div class="settings-row-icon"><i class="fa-solid fa-border-all"></i></div>
+                  <div class="settings-row-text">
+                    <span class="settings-row-title">Board Boundaries</span>
+                    <span class="settings-row-desc">Wall collision vs portal wrap</span>
+                  </div>
+                </div>
+                <div class="segmented-control" role="radiogroup">
+                  <button type="button" id="wall-mode-solid" class="segment-btn active" data-wall="solid">
+                    Solid Walls
+                  </button>
+                  <button type="button" id="wall-mode-wrap" class="segment-btn" data-wall="wrap">
+                    Portal Wrap
+                  </button>
+                </div>
+              </div>
+
+              <!-- Row: Grid Dimensions -->
+              <div class="settings-row">
+                <div class="settings-row-info">
+                  <div class="settings-row-icon"><i class="fa-solid fa-table-cells"></i></div>
+                  <div class="settings-row-text">
+                    <span class="settings-row-title">Grid Dimensions</span>
+                    <span class="settings-row-desc">Playfield units</span>
+                  </div>
+                </div>
+                <div class="segmented-control" role="radiogroup">
+                  <button type="button" id="grid-size-20" class="segment-btn active" data-grid="20">
+                    Standard (20 × 20)
+                  </button>
+                  <button type="button" id="grid-size-24" class="segment-btn" data-grid="24">
+                    Spacious (24 × 24)
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Danger Section -->
+          <div class="settings-danger-card">
+            <div class="danger-info">
+              <span class="danger-title">Erase All Data</span>
+              <span class="danger-desc">Reset high scores, stats and unlocked achievements.</span>
+            </div>
+            <button type="button" id="btn-reset-storage" class="btn btn-danger-subtle btn-sm">
+              <i class="fa-solid fa-trash-can"></i>
+              <span>Clear Data</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="modal-footer flex-row-buttons">
+          <button type="button" id="btn-cancel-settings" class="btn btn-secondary flex-1">
+            <span>Cancel</span>
+          </button>
+          <button type="button" id="btn-save-settings" class="btn btn-primary flex-2">
+            <i class="fa-solid fa-check"></i>
+            <span>Save & Apply</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW TO PLAY MODAL (Dedicated Interactive Guide) -->
+    <div id="modal-help" class="modal-window modal-window-help" role="dialog" aria-modal="true" aria-labelledby="help-modal-title">
+      <div class="modal-card modal-scrollable">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <h2 id="help-modal-title" class="modal-title">How to Play</h2>
+            <p class="modal-subtitle">Rules, steering controls, food varieties & scoring mechanics.</p>
+          </div>
+          <button id="btn-close-help" class="btn-icon" aria-label="Close Guide">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Guide Navigation Tabs -->
+          <div class="help-tabs-bar">
+            <button type="button" class="help-tab active" data-help-tab="controls">
+              <i class="fa-solid fa-keyboard"></i> Controls
+            </button>
+            <button type="button" class="help-tab" data-help-tab="foods">
+              <i class="fa-solid fa-apple-whole"></i> Foods & Items
+            </button>
+            <button type="button" class="help-tab" data-help-tab="mechanics">
+              <i class="fa-solid fa-fire"></i> Combos & Rules
+            </button>
+          </div>
+
+          <!-- Guide Tab Contents -->
+          <div class="help-content-area">
+            <!-- Tab 1: Controls -->
+            <div id="help-pane-controls" class="help-pane active">
+              <div class="help-guide-card web-only-shortcuts">
+                <span class="help-card-title">Desktop & Laptop Keyboard</span>
+                <div class="help-keys-grid">
+                  <div class="help-key-item">
+                    <span class="key-badge-wrap"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or <kbd>Arrow Keys</kbd></span>
+                    <span class="key-desc">Turn snake smoothly in 4 directions</span>
+                  </div>
+                  <div class="help-key-item">
+                    <span class="key-badge-wrap"><kbd>Space</kbd> or <kbd>P</kbd></span>
+                    <span class="key-desc">Instant pause or resume game</span>
+                  </div>
+                  <div class="help-key-item">
+                    <span class="key-badge-wrap"><kbd>R</kbd></span>
+                    <span class="key-desc">Quick restart run</span>
+                  </div>
+                  <div class="help-key-item">
+                    <span class="key-badge-wrap"><kbd>M</kbd></span>
+                    <span class="key-desc">Toggle sound effects on or off</span>
+                  </div>
+                  <div class="help-key-item">
+                    <span class="key-badge-wrap"><kbd>T</kbd> / <kbd>O</kbd> / <kbd>H</kbd></span>
+                    <span class="key-desc">Open Achievements (T), Settings (O), or Guide (H)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="help-guide-card">
+                <span class="help-card-title">Mobile & Tablet Controls</span>
+                <div class="help-touch-explainer">
+                  <div class="touch-method-item">
+                    <div class="method-icon"><i class="fa-solid fa-gamepad"></i></div>
+                    <div>
+                      <strong>On-Screen D-Pad</strong>
+                      <p>Tap Up, Down, Left, Right chevrons. Center circle pauses.</p>
+                    </div>
+                  </div>
+                  <div class="touch-method-item">
+                    <div class="method-icon"><i class="fa-solid fa-hand-pointer"></i></div>
+                    <div>
+                      <strong>Swipe Anywhere on Board</strong>
+                      <p>Flick your finger across the playfield to steer seamlessly.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 2: Foods & Power-Ups -->
+            <div id="help-pane-foods" class="help-pane">
+              <div class="food-explainer-list">
+                <!-- 1. Classic Apple -->
+                <div class="food-explainer-item">
+                  <div class="food-preview-disc apple-disc">
+                    <div class="mini-apple-leaf"></div>
+                  </div>
+                  <div class="food-explainer-info">
+                    <div class="food-name-row">
+                      <strong>Classic Apple</strong>
+                      <span class="food-badge-base">+10 Pts × Combo</span>
+                    </div>
+                    <p>Always on the board. Each apple increases your snake's length by 1 segment and charges your combo streak.</p>
+                  </div>
+                </div>
+
+                <!-- 2. Golden Star Fruit -->
+                <div class="food-explainer-item">
+                  <div class="food-preview-disc star-disc">
+                    <i class="fa-solid fa-star"></i>
+                  </div>
+                  <div class="food-explainer-info">
+                    <div class="food-name-row">
+                      <strong>Golden Star Fruit</strong>
+                      <span class="food-badge-bonus">+35 Pts • +2.0s Combo</span>
+                    </div>
+                    <p>Spawns periodically for 8 seconds. Awards massive points and instantly extends your active combo window!</p>
+                  </div>
+                </div>
+
+                <!-- 3. Chill Berry -->
+                <div class="food-explainer-item">
+                  <div class="food-preview-disc berry-disc">
+                    <i class="fa-solid fa-snowflake"></i>
+                  </div>
+                  <div class="food-explainer-info">
+                    <div class="food-name-row">
+                      <strong>Chill Berry</strong>
+                      <span class="food-badge-chill">+20 Pts • Pace Slowed 6s</span>
+                    </div>
+                    <p>Rare ice blue fruit. Reduces frantic movement speed by 25% for 6 seconds, granting easy maneuvering in tight spaces.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 3: Combos & Rules -->
+            <div id="help-pane-mechanics" class="help-pane">
+              <div class="help-guide-card">
+                <span class="help-card-title"><i class="fa-solid fa-fire text-amber"></i> Combo Streak Multiplier</span>
+                <p class="help-text-para">
+                  Eating another food item before your combo bar drains levels up your multiplier from <strong>x1</strong> up to <strong>x5</strong>! 
+                  At x5, every food item awards quintuple points, propelling your score to record levels.
+                </p>
+              </div>
+
+              <div class="help-guide-card">
+                <span class="help-card-title">Game Modes & Speeds</span>
+                <ul class="help-bullet-list">
+                  <li><strong>Relax (160ms):</strong> Generous 5.5s combo timer. Perfect for casual, peaceful play.</li>
+                  <li><strong>Normal (115ms):</strong> Balanced 4.5s combo timer. Classic authentic arcade experience.</li>
+                  <li><strong>Fast (80ms):</strong> 3.8s combo timer with higher base points (+20% bonus) for reflex masters.</li>
+                  <li><strong>Dynamic:</strong> Begins at comfortable 135ms and accelerates down to 60ms as your snake grows.</li>
+                </ul>
+              </div>
+
+              <div class="help-guide-card">
+                <span class="help-card-title">Boundaries (Wall Modes)</span>
+                <p class="help-text-para">
+                  • <strong>Solid Walls:</strong> Crashing into the border ends the run.<br>
+                  • <strong>Portal Wrap:</strong> Slithering into an edge warps your snake through to the opposite side!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="btn-done-help" class="btn btn-primary btn-block">
+            <span>Got It, Let's Play</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACHIEVEMENTS MODAL -->
+    <div id="modal-achievements" class="modal-window modal-window-achievements" role="dialog" aria-modal="true" aria-labelledby="achievements-modal-title">
+      <div class="modal-card modal-scrollable">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <div class="header-badge-row">
+              <h2 id="achievements-modal-title" class="modal-title">Achievements</h2>
+              <span id="modal-achievements-progress-pill" class="badge-pill">0 / 15 Unlocked</span>
+            </div>
+            <p class="modal-subtitle">Milestones, streaks & challenges.</p>
+          </div>
+          <button id="btn-close-achievements" class="btn-icon" aria-label="Close Achievements">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Filter Tabs -->
+          <div class="achieve-filter-bar">
+            <button type="button" class="filter-tab active" data-filter="all">All (15)</button>
+            <button type="button" class="filter-tab" data-filter="unlocked">Unlocked</button>
+            <button type="button" class="filter-tab" data-filter="locked">In Progress</button>
+          </div>
+
+          <!-- List of 15 Achievements -->
+          <div id="achievements-list" class="achievements-list">
+            <!-- Populated dynamically by JavaScript -->
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="btn-done-achievements" class="btn btn-primary btn-block">
+            <span>Back to Game</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Confirmation Dialog -->
+  <div id="confirm-dialog" class="confirm-dialog-overlay" aria-hidden="true">
+    <div class="confirm-dialog-card">
+      <h3 id="confirm-title" class="confirm-title">Are you sure?</h3>
+      <p id="confirm-message" class="confirm-message">This action cannot be undone.</p>
+      <div class="confirm-actions">
+        <button id="confirm-btn-cancel" class="btn btn-secondary">Cancel</button>
+        <button id="confirm-btn-ok" class="btn btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Toast Notification Container (Achievements Only - Upper Center) -->
+  <div id="achievement-toast-container" class="achievement-toast-container" aria-live="assertive"></div>
+
+  <!-- Bottom Toast Notification Container (Gameplay Items, Status & Alerts - Lower Center) -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Application Logic -->
+  <script src="js/app.js"></script>
+</body>
+</html>
