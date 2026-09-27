@@ -150,6 +150,8 @@ If you prefer not to use Git, you can download the project as a ZIP file:
 3. Select **"Download ZIP"** from the dropdown menu.
 4. Once the ZIP file is downloaded, extract it to your desired location.
 
+---
+
 ## Usage
 
 This is a standard frontend project, so you can run it directly in your web browser without any complex setup or server configuration:
@@ -160,6 +162,8 @@ This is a standard frontend project, so you can run it directly in your web brow
 
 *Alternative Method:* You can also drag and drop the `index.html` file directly into any open browser tab (Chrome, Edge, Firefox, Safari, etc.).
 
+---
+
 ## Browser Compatibility
 
 Tested and working on:
@@ -169,13 +173,19 @@ Tested and working on:
 - Safari (latest)
 - Mobile browsers (iOS Safari, Android Chrome)
 
+---
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue for any enhancements or bug fixes.
 
+---
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+
+---
 
 ## Contact
 
